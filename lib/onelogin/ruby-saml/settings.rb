@@ -66,6 +66,12 @@ module OneLogin
       # Compability
       attr_accessor :assertion_consumer_logout_service_url
       attr_accessor :assertion_consumer_logout_service_binding
+      attr_accessor :display_name_english
+      attr_accessor :display_name_french
+      attr_accessor :manage_name_id_service_url
+      attr_accessor :manage_name_id_service_binding
+      attr_accessor :change_notify_service_url
+      attr_accessor :change_notify_service_binding
 
       # @return [String] Single Logout Service URL.
       #

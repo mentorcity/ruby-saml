@@ -26,6 +26,26 @@ module OneLogin
           namespaces["xmlns:saml"] = "urn:oasis:names:tc:SAML:2.0:assertion"
         end
         root = meta_doc.add_element "md:EntityDescriptor", namespaces
+
+        if settings.display_name_english || settings.display_name_french
+          exts = root.add_element "md:Extensions"
+          ui_info = exts.add_element "md:UIInfo", {
+            "xmlns:mdui" => "urn:oasis:names:tc:SAML:metadata:ui"
+          }
+          if settings.display_name_english
+            disp_name = ui_info.add_element "mdui:DisplayName", {
+              "xml:lang" => "en"
+            }
+            disp_name.text = settings.display_name_english
+          end
+          if settings.display_name_french
+            disp_name = ui_info.add_element "mdui:DisplayName", {
+              "xml:lang" => "fr"
+            }
+            disp_name.text = settings.display_name_french
+          end
+        end
+
         sp_sso = root.add_element "md:SPSSODescriptor", {
             "protocolSupportEnumeration" => "urn:oasis:names:tc:SAML:2.0:protocol",
             "AuthnRequestsSigned" => settings.security[:authn_requests_signed],
@@ -36,6 +56,8 @@ module OneLogin
         # with SP certificate, and new SP certificate if any
         cert = settings.get_sp_cert
         cert_new = settings.get_sp_cert_new
+
+        root.add_attribute("validUntil", cert.not_after.iso8601(3)) if cert
 
         for sp_cert in [cert, cert_new]
           if sp_cert
@@ -77,6 +99,21 @@ module OneLogin
               "Location" => settings.assertion_consumer_service_url,
               "isDefault" => true,
               "index" => 0
+          }
+        end
+
+        if settings.manage_name_id_service_url
+          sp_sso.add_element "md:ManageNameIDService", {
+            "Binding" => settings.manage_name_id_service_binding,
+            "Location" => settings.manage_name_id_service_url,
+          }
+        end
+
+        if settings.change_notify_service_url
+          ext = sp_sso.add_element "md:Extensions"
+          ext.add_element "md:ChangeNotifyService", {
+            "Binding" => settings.change_notify_service_binding,
+            "Location" => settings.change_notify_service_url,
           }
         end
 
