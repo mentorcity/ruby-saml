@@ -27,25 +27,6 @@ module OneLogin
         end
         root = meta_doc.add_element "md:EntityDescriptor", namespaces
 
-        if settings.display_name_english || settings.display_name_french
-          exts = root.add_element "md:Extensions"
-          ui_info = exts.add_element "md:UIInfo", {
-            "xmlns:mdui" => "urn:oasis:names:tc:SAML:metadata:ui"
-          }
-          if settings.display_name_english
-            disp_name = ui_info.add_element "mdui:DisplayName", {
-              "xml:lang" => "en"
-            }
-            disp_name.text = settings.display_name_english
-          end
-          if settings.display_name_french
-            disp_name = ui_info.add_element "mdui:DisplayName", {
-              "xml:lang" => "fr"
-            }
-            disp_name.text = settings.display_name_french
-          end
-        end
-
         sp_sso = root.add_element "md:SPSSODescriptor", {
             "protocolSupportEnumeration" => "urn:oasis:names:tc:SAML:2.0:protocol",
             "AuthnRequestsSigned" => settings.security[:authn_requests_signed],
@@ -89,6 +70,12 @@ module OneLogin
               "ResponseLocation" => settings.single_logout_service_url
           }
         end
+        if settings.manage_name_id_service_url
+          sp_sso.add_element "md:ManageNameIDService", {
+            "Binding" => settings.manage_name_id_service_binding,
+            "Location" => settings.manage_name_id_service_url,
+          }
+        end
         if settings.name_identifier_format
           nameid = sp_sso.add_element "md:NameIDFormat"
           nameid.text = settings.name_identifier_format
@@ -102,19 +89,32 @@ module OneLogin
           }
         end
 
-        if settings.manage_name_id_service_url
-          sp_sso.add_element "md:ManageNameIDService", {
-            "Binding" => settings.manage_name_id_service_binding,
-            "Location" => settings.manage_name_id_service_url,
-          }
-        end
-
-        if settings.change_notify_service_url
+        if settings.change_notify_service_url || settings.display_name_english || settings.display_name_french
           ext = sp_sso.add_element "md:Extensions"
-          ext.add_element "md:ChangeNotifyService", {
-            "Binding" => settings.change_notify_service_binding,
-            "Location" => settings.change_notify_service_url,
-          }
+          if settings.display_name_english || settings.display_name_french
+            ui_info = ext.add_element "md:UIInfo", {
+              "xmlns:mdui" => "urn:oasis:names:tc:SAML:metadata:ui"
+            }
+            if settings.display_name_english
+              disp_name = ui_info.add_element "mdui:DisplayName", {
+                "xml:lang" => "en"
+              }
+              disp_name.text = settings.display_name_english
+            end
+            if settings.display_name_french
+              disp_name = ui_info.add_element "mdui:DisplayName", {
+                "xml:lang" => "fr"
+              }
+              disp_name.text = settings.display_name_french
+            end
+          end
+          if settings.change_notify_service_url
+            ext.add_element "md:ChangeNotifyService", {
+              "Binding" => settings.change_notify_service_binding,
+              "Location" => settings.change_notify_service_url,
+              "editProfileReturnUrl" => settings.change_notify_return_url,
+            }
+          end
         end
 
         if settings.attribute_consuming_service.configured?

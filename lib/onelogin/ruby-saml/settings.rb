@@ -71,6 +71,7 @@ module OneLogin
       attr_accessor :manage_name_id_service_url
       attr_accessor :manage_name_id_service_binding
       attr_accessor :change_notify_service_url
+      attr_accessor :change_notify_return_url
       attr_accessor :change_notify_service_binding
 
       # @return [String] Single Logout Service URL.
