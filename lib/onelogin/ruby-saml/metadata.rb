@@ -27,14 +27,8 @@ module OneLogin
         end
         root = meta_doc.add_element "md:EntityDescriptor", namespaces
 
-        sp_sso = root.add_element "md:SPSSODescriptor", {
-            "protocolSupportEnumeration" => "urn:oasis:names:tc:SAML:2.0:protocol",
-            "AuthnRequestsSigned" => settings.security[:authn_requests_signed],
-            "WantAssertionsSigned" => settings.security[:want_assertions_signed],
-        }
-
         if settings.display_name_english || settings.display_name_french
-          ext = sp_sso.add_element "md:Extensions"
+          ext = root.add_element "md:Extensions"
           ui_info = ext.add_element "md:UIInfo", {
             "xmlns:mdui" => "urn:oasis:names:tc:SAML:metadata:ui"
           }
@@ -51,6 +45,12 @@ module OneLogin
             disp_name.text = settings.display_name_french
           end
         end
+
+        sp_sso = root.add_element "md:SPSSODescriptor", {
+            "protocolSupportEnumeration" => "urn:oasis:names:tc:SAML:2.0:protocol",
+            "AuthnRequestsSigned" => settings.security[:authn_requests_signed],
+            "WantAssertionsSigned" => settings.security[:want_assertions_signed],
+        }
 
         # Add KeyDescriptor if messages will be signed / encrypted
         # with SP certificate, and new SP certificate if any
