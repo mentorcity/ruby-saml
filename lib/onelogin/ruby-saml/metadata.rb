@@ -33,31 +33,22 @@ module OneLogin
             "WantAssertionsSigned" => settings.security[:want_assertions_signed],
         }
 
-        if settings.change_notify_service_url || settings.display_name_english || settings.display_name_french
+        if settings.display_name_english || settings.display_name_french
           ext = sp_sso.add_element "md:Extensions"
-          if settings.display_name_english || settings.display_name_french
-            ui_info = ext.add_element "md:UIInfo", {
-              "xmlns:mdui" => "urn:oasis:names:tc:SAML:metadata:ui"
+          ui_info = ext.add_element "md:UIInfo", {
+            "xmlns:mdui" => "urn:oasis:names:tc:SAML:metadata:ui"
+          }
+          if settings.display_name_english
+            disp_name = ui_info.add_element "mdui:DisplayName", {
+              "xml:lang" => "en"
             }
-            if settings.display_name_english
-              disp_name = ui_info.add_element "mdui:DisplayName", {
-                "xml:lang" => "en"
-              }
-              disp_name.text = settings.display_name_english
-            end
-            if settings.display_name_french
-              disp_name = ui_info.add_element "mdui:DisplayName", {
-                "xml:lang" => "fr"
-              }
-              disp_name.text = settings.display_name_french
-            end
+            disp_name.text = settings.display_name_english
           end
-          if settings.change_notify_service_url
-            ext.add_element "md:ChangeNotifyService", {
-              "Binding" => settings.change_notify_service_binding,
-              "Location" => settings.change_notify_service_url,
-              "editProfileReturnUrl" => settings.change_notify_return_url,
+          if settings.display_name_french
+            disp_name = ui_info.add_element "mdui:DisplayName", {
+              "xml:lang" => "fr"
             }
+            disp_name.text = settings.display_name_french
           end
         end
 
@@ -140,6 +131,15 @@ module OneLogin
               end
             end
           end
+        end
+
+        if settings.change_notify_service_url
+          ext = sp_sso.add_element "md:Extensions"
+          ext.add_element "md:ChangeNotifyService", {
+            "Binding" => settings.change_notify_service_binding,
+            "Location" => settings.change_notify_service_url,
+            "editProfileReturnUrl" => settings.change_notify_return_url,
+          }
         end
 
         # With OpenSSO, it might be required to also include
