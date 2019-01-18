@@ -29,6 +29,7 @@ module OneLogin
       end
 
       # IdP Data
+      attr_accessor :issuer_url
       attr_accessor :idp_entity_id
       attr_accessor :idp_sso_target_url
       attr_accessor :idp_slo_target_url
