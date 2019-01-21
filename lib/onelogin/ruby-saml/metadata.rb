@@ -55,6 +55,15 @@ module OneLogin
             "WantAssertionsSigned" => settings.security[:want_assertions_signed],
         }
 
+        if settings.change_notify_service_url
+          ext = sp_sso.add_element "md:Extensions"
+          ext.add_element "md:ChangeNotifyService", {
+            "Binding" => settings.change_notify_service_binding,
+            "Location" => settings.change_notify_service_url,
+            "editProfileReturnUrl" => settings.change_notify_return_url,
+          }
+        end
+
         # Add KeyDescriptor if messages will be signed / encrypted
         # with SP certificate, and new SP certificate if any
         cert = settings.get_sp_cert
@@ -134,15 +143,6 @@ module OneLogin
               end
             end
           end
-        end
-
-        if settings.change_notify_service_url
-          ext = sp_sso.add_element "md:Extensions"
-          ext.add_element "md:ChangeNotifyService", {
-            "Binding" => settings.change_notify_service_binding,
-            "Location" => settings.change_notify_service_url,
-            "editProfileReturnUrl" => settings.change_notify_return_url,
-          }
         end
 
         # With OpenSSO, it might be required to also include
