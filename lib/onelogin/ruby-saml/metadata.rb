@@ -32,7 +32,7 @@ module OneLogin
 
         if settings.display_name_english || settings.display_name_french
           ext = root.add_element "md:Extensions"
-          ui_info = ext.add_element "md:UIInfo", {
+          ui_info = ext.add_element "mdui:UIInfo", {
             "xmlns:mdui" => "urn:oasis:names:tc:SAML:metadata:ui"
           }
           if settings.display_name_english
