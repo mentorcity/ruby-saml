@@ -27,8 +27,9 @@ module OneLogin
         end
         root = meta_doc.add_element "md:EntityDescriptor", namespaces
 
-        issuer = root.add_element "saml:Issuer"
-        issuer.text = settings.issuer_url
+        # MC - try without this element
+        # issuer = root.add_element "saml:Issuer"
+        # issuer.text = settings.issuer_url
 
         if settings.display_name_english || settings.display_name_french
           ext = root.add_element "md:Extensions"
