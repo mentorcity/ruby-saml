@@ -107,7 +107,10 @@ module OneLogin
         response_doc = XMLSecurity::Document.new
         response_doc.uuid = uuid
 
-        root = response_doc.add_element 'samlp:LogoutResponse', { 'xmlns:samlp' => 'urn:oasis:names:tc:SAML:2.0:protocol', "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion" }
+        response_doc << REXML::XMLDecl.new(nil, "UTF-8") #MC
+        rootroot = response_doc.add_element 'soap:Envelope', { 'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance', 'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema', 'xmlns:soap' => 'http://schemas.xmlsoap.org/soap/envelope/' } #MC
+        body = rootroot.add_element 'soap:Body' #MC
+        root = body.add_element 'samlp:LogoutResponse', { 'xmlns:samlp' => 'urn:oasis:names:tc:SAML:2.0:protocol', "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion" }
         root.attributes['ID'] = uuid
         root.attributes['IssueInstant'] = time
         root.attributes['Version'] = '2.0'

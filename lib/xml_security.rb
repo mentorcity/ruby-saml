@@ -89,7 +89,7 @@ module XMLSecurity
     SHA384          = "http://www.w3.org/2001/04/xmldsig-more#sha384"
     SHA512          = 'http://www.w3.org/2001/04/xmlenc#sha512'
     ENVELOPED_SIG   = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
-    INC_PREFIX_LIST = "#default samlp saml ds xs xsi md"
+    INC_PREFIX_LIST = "#default soap samlp saml ds xs xsi md" #MC
 
     attr_writer :uuid
 
@@ -161,7 +161,13 @@ module XMLSecurity
       # add the signature
       issuer_element = self.elements["//saml:Issuer"]
       if issuer_element
-        self.root.insert_after issuer_element, signature_element
+        # MC dig into the SOAP wrapper, if there is one
+        root = self.elements["//soap:Envelope"] #MC
+        root = root.elements["//soap:Body"] if root #MC
+        root = root.elements[1] if root #MC
+        root ||= self.root # MC not SOAP enveloped
+        root.insert_after issuer_element, signature_element #MC
+        #MC self.root.insert_after issuer_element, signature_element
       else
         if sp_sso_descriptor = self.elements["/md:EntityDescriptor"]
           self.root.insert_before sp_sso_descriptor, signature_element
