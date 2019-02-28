@@ -166,7 +166,7 @@ module XMLSecurity
         root = root.elements["//soap:Body"] if root #MC
         root = root.elements[1] if root #MC
         root ||= self.root # MC not SOAP enveloped
-        root.insert_after issuer_element, signature_element #MC
+        root.insert_before issuer_element, signature_element #MC - where NS likes it
         #MC self.root.insert_after issuer_element, signature_element
       else
         if sp_sso_descriptor = self.elements["/md:EntityDescriptor"]
