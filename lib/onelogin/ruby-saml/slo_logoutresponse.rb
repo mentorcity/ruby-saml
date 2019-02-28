@@ -96,21 +96,25 @@ module OneLogin
       # @param logout_message [String] The Message to be placed as StatusMessage in the logout response
       # @return [String] The SAMLResponse String.
       #
-      def create_logout_response_xml_doc(settings, request_id = nil, logout_message = nil)
-        document = create_xml_document(settings, request_id, logout_message)
+      def create_logout_response_xml_doc(settings, request_id = nil, logout_message = nil, add_soap_wrapper = false)
+        document = create_xml_document(settings, request_id, logout_message, add_soap_wrapper)
         sign_document(document, settings)
       end
 
-      def create_xml_document(settings, request_id = nil, logout_message = nil)
+      def create_xml_document(settings, request_id = nil, logout_message = nil, add_soap_wrapper = false)
         time = Time.now.utc.strftime('%Y-%m-%dT%H:%M:%SZ')
 
         response_doc = XMLSecurity::Document.new
         response_doc.uuid = uuid
 
-        response_doc << REXML::XMLDecl.new(nil, "UTF-8") #MC
-        rootroot = response_doc.add_element 'soap:Envelope', { 'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance', 'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema', 'xmlns:soap' => 'http://schemas.xmlsoap.org/soap/envelope/' } #MC
-        body = rootroot.add_element 'soap:Body' #MC
-        root = body.add_element 'samlp:LogoutResponse', { 'xmlns:samlp' => 'urn:oasis:names:tc:SAML:2.0:protocol', "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion" }
+        if add_soap_wrapper
+          response_doc << REXML::XMLDecl.new(nil, "UTF-8") #MC
+          rootroot = response_doc.add_element 'soap:Envelope', { 'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance', 'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema', 'xmlns:soap' => 'http://schemas.xmlsoap.org/soap/envelope/' } #MC
+          body = rootroot.add_element 'soap:Body' #MC
+        else
+          body = response_doc
+        end
+        root = body.add_element 'samlp:LogoutResponse', { 'xmlns:samlp' => 'urn:oasis:names:tc:SAML:2.0:protocol', "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion" } #MC
         root.attributes['ID'] = uuid
         root.attributes['IssueInstant'] = time
         root.attributes['Version'] = '2.0'

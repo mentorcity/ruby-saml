@@ -88,18 +88,25 @@ module OneLogin
       # @param settings [OneLogin::RubySaml::Settings|nil] Toolkit settings
       # @return [String] The SAMLRequest String.
       #
-      def create_logout_request_xml_doc(settings)
-        document = create_xml_document(settings)
+      def create_logout_request_xml_doc(settings, add_soap_wrapper = false)
+        document = create_xml_document(settings, add_soap_wrapper)
         sign_document(document, settings)
       end
 
-      def create_xml_document(settings)
+      def create_xml_document(settings, add_soap_wrapper = false)
         time = Time.now.utc.strftime("%Y-%m-%dT%H:%M:%SZ")
 
         request_doc = XMLSecurity::Document.new
         request_doc.uuid = uuid
 
-        root = request_doc.add_element "samlp:LogoutRequest", { "xmlns:samlp" => "urn:oasis:names:tc:SAML:2.0:protocol", "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion" }
+        if add_soap_wrapper
+          request_doc << REXML::XMLDecl.new(nil, "UTF-8") #MC
+          rootroot = request_doc.add_element 'soap:Envelope', { 'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance', 'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema', 'xmlns:soap' => 'http://schemas.xmlsoap.org/soap/envelope/' } #MC
+          body = rootroot.add_element 'soap:Body' #MC
+        else
+          body = request_doc
+        end
+        root = body.add_element "samlp:LogoutRequest", { "xmlns:samlp" => "urn:oasis:names:tc:SAML:2.0:protocol", "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion" }
         root.attributes['ID'] = uuid
         root.attributes['IssueInstant'] = time
         root.attributes['Version'] = "2.0"
