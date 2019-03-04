@@ -177,6 +177,14 @@ module XMLSecurity
       end
     end
 
+    def encrypt_elements(document, selector, private_key, cert, block_encryption, key_transport)
+      elements = document.elements[selector]
+      encrypted = private_key.encrypt(elements.to_s)
+      debugger
+      #replace the element here?
+      encrypted
+    end
+
     protected
 
     def compute_signature(private_key, signature_algorithm, document)

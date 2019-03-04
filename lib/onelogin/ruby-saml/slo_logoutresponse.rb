@@ -153,17 +153,8 @@ module OneLogin
       end
 
       def encrypt_document(document, settings) #MC
-        nameid = document.elements['//saml:NameID']
-
-        opts = {
-          block_encryption: settings.security[:block_encryption],
-          key_transport: settings.security[:key_transport],
-          cert: Base64.ncode64(settings.certificate)
-        }
-        encryptor = SamlIdpEncryptor.new(opts)
-        encrypted = encryptor.encrypt(nameid.to_s)
-
-debugger
+        nameid_selector = '//saml:NameID'
+        document.encrypt_elements(document, nameid_selector, settings.get_sp_key, settings.get_sp_cert, settings.security[:block_encryption], settings.security[:key_transport])
         document
       end
 
