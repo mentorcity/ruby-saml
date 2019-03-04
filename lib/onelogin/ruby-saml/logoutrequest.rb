@@ -147,6 +147,18 @@ module OneLogin
 
         document
       end
+
+      def encrypt_document(document, settings) #MC
+        opts = {
+          block_encryption: settings.security[:block_encryption],
+          key_transport: settings.security[:key_transport],
+          cert: settings.certificate
+        }
+        encryptor = SamlIdpEncryptor.new(opts)
+debugger
+        encryptor.encrypt(document)
+      end
+
     end
   end
 end
