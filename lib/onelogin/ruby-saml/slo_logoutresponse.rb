@@ -158,7 +158,7 @@ module OneLogin
         opts = {
           block_encryption: settings.security[:block_encryption],
           key_transport: settings.security[:key_transport],
-          cert: settings.certificate
+          cert: Base64.ncode64(settings.certificate)
         }
         encryptor = SamlIdpEncryptor.new(opts)
         encrypted = encryptor.encrypt(nameid.to_s)
