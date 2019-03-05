@@ -177,11 +177,38 @@ module XMLSecurity
       end
     end
 
-    def encrypt_elements(document, selector, private_key, cert, block_encryption, key_transport)
+    def encrypt_elements(document, selector, cert)
+      enc_wrapper = REXML::Element.new('saml:EncryptedID').add_namespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion')
+      data = enc_wrapper.add_element('xenc:EncryptedData', { 'Type' => 'http://www.w3.org/2001/04/xmlenc#Element', 'ID' => 'ee2eaf68162b49bdbf16c851c1099cb0' }).add_namespace('xenc', 'http://www.w3.org/2001/04/xmlenc#')
+      data.add_element('xenc:EncryptionMethod', { 'Algorithm' => 'http://www.w3.org/2001/04/xmlenc#aes128-cbc' })
+      cipherdata = data.add_element('xenc:CipherData')
+      ciphervalue = cipherdata.add_element('xenc:CipherValue')
+
+      keyinfo = data.add_element('ds:KeyInfo').add_namespace('ds', 'http://www.w3.org/2000/09/xmldsig#')
+      keyinfo.add_element('ds:RetrievalMethod', { 'Type' => 'http://www.w3/org/2001/04/xmlenc#EncryptedKey', 'URI' => 'fe282000712f4dbe85791fd1c988061c' })
+      key = enc_wrapper.add_element('xenc:EncryptedKey', { 'ID' => 'fe282000712f4dbe85791fd1c988061c' }).add_namespace('xenc', 'http://www.w3.org/2001/04/xmlenc#')
+      encm = key.add_element('xenc:EncryptionMethod', { 'Algorithm' => 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p' })
+      encm.add_element('ds:DigestMethod', { 'Algorithm' => 'http://www.w3.org/2000/09/xmldsig#sha1' }).add_namespace('ds', 'http://www.w3/org/2000/09/xmldsig#')
+      kipherdata = key.add_element('xenc:CipherData')
+      kiphervalue = kipherdata.add_element('xenc:CipherValue')
+
+      ref = key.add_element('xenc:ReferenceList')
+      ref.add_element('xenc:DataReference', { 'URI' => '#ee2eaf68162b49bdbf16c851c1099cb0' })
+
+      cipher = OpenSSL::Cipher.new('AES-128-CBC')
+      cipher.encrypt
+      key = cipher.random_key
+      iv = cipher.random_iv # also sets the generated IV on the Cipher
+      encrypted = cipher.update(elements.to_s) + cipher.final
+      ciphervalue.text = Base64.encode64(encrypted)
+
+      kelements = key + iv
+      kencrypted = cert.public_encrypt(kelement.to_s, OpenSSL::PKey::RSA::PKCS1_OAEP_PADDING)
+      kiphervalue.text = Base64.encode64(kencrypted)
+
       elements = document.elements[selector]
-      encrypted = private_key.encrypt(elements.to_s)
-      debugger
-      #replace the element here?
+      elements.replace_with(enc_wrapper)
+
       encrypted
     end
 

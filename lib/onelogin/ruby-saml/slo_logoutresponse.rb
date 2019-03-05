@@ -151,13 +151,6 @@ module OneLogin
 
         document
       end
-
-      def encrypt_document(document, settings) #MC
-        nameid_selector = '//saml:NameID'
-        document.encrypt_elements(document, nameid_selector, settings.get_sp_key, settings.get_sp_cert, settings.security[:block_encryption], settings.security[:key_transport])
-        document
-      end
-
     end
   end
 end
