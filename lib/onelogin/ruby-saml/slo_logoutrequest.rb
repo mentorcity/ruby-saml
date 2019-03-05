@@ -89,12 +89,12 @@ module OneLogin
       def name_id_node #MC
         @name_id_node ||=
           begin
-            encrypted_node = REXML::XPath.match(document, '/saml2p:LogoutRequest/saml:EncryptedID')
+            encrypted_node = REXML::XPath.match(document, '/saml2p:LogoutRequest/saml2:EncryptedID')
             if encrypted_node
               node = decrypt_nameid(encrypted_node)
               STDERR.puts "\n\n\n\n#{node}\n\n\n\n" unless Rails.env.production?
             else
-              node = REXML::XPath.match('/saml2p:LogoutRequest/saml:NameID')
+              node = REXML::XPath.match('/saml2p:LogoutRequest/saml2:NameID')
             end
           end
       end
