@@ -202,14 +202,14 @@ module XMLSecurity
       encrypted = cipher.update(elements.to_s) + cipher.final
       ciphervalue.text = Base64.encode64(encrypted)
 
-      kelements = key + iv
+      kelement = key + iv
       kencrypted = cert.public_encrypt(kelement.to_s, OpenSSL::PKey::RSA::PKCS1_OAEP_PADDING)
       kiphervalue.text = Base64.encode64(kencrypted)
 
       elements = document.elements[selector]
       elements.replace_with(enc_wrapper)
 
-      encrypted
+      document
     end
 
     protected
