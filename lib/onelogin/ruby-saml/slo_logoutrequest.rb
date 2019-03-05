@@ -56,6 +56,31 @@ module OneLogin
       end
 
       # from response.rb
+      def decrypt_element(encrypt_node, rgrex)
+        if settings.nil? || !settings.get_sp_key
+          raise ValidationError.new('An ' + encrypt_node.name + ' found and no SP private key found on the settings to decrypt it')
+        end
+
+
+        if encrypt_node.name == 'EncryptedAttribute'
+          node_header = '<node xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
+        else
+          node_header = '<node xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">'
+        end
+
+        elem_plaintext = OneLogin::RubySaml::Utils.decrypt_data(encrypt_node, settings.get_sp_key)
+        # If we get some problematic noise in the plaintext after decrypting.
+        # This quick regexp parse will grab only the Element and discard the noise.
+        elem_plaintext = elem_plaintext.match(rgrex)[0]
+
+        # To avoid namespace errors if saml namespace is not defined
+        # create a parent node first with the namespace defined
+        elem_plaintext = node_header + elem_plaintext + '</node>'
+        doc = REXML::Document.new(elem_plaintext)
+        doc.root[0]
+      end
+
+      # from response.rb
       def decrypt_nameid(encryptedid_node) #MC
         decrypt_element(encryptedid_node, /(.*<\/(\w+:)?NameID>)/m)
       end
