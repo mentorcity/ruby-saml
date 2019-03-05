@@ -56,15 +56,20 @@ module OneLogin
       end
 
       # from response.rb
+      def decrypt_nameid(encryptedid_node) #MC
+        decrypt_element(encryptedid_node, /(.*<\/(\w+:)?NameID>)/m)
+      end
+
+      # from response.rb
       def name_id_node #MC
         @name_id_node ||=
           begin
-            encrypted_node = xpath_first_from_signed_assertion('/p:LogoutRequest/a:EncryptedID')
+            encrypted_node = REXML::XPath.match(document, '/p:LogoutRequest/a:EncryptedID')
             if encrypted_node
               node = decrypt_nameid(encrypted_node)
               STDERR.puts "\n\n\n\n#{node}\n\n\n\n" unless Rails.env.production?
             else
-              node = xpath_first_from_signed_assertion('/a:LogoutRequest/a:NameID')
+              node = REXML::XPath.match('/a:LogoutRequest/a:NameID')
             end
           end
       end
