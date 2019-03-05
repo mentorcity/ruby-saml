@@ -33,6 +33,7 @@ module OneLogin
       attr_accessor :idp_entity_id
       attr_accessor :idp_sso_target_url
       attr_accessor :idp_slo_target_url
+      attr_accessor :idp_sloresp_target_url
       attr_accessor :idp_cert
       attr_accessor :idp_cert_fingerprint
       attr_accessor :idp_cert_fingerprint_algorithm

@@ -30,14 +30,14 @@ module OneLogin
       #
       def create(settings, request_id = nil, logout_message = nil, params = {})
         params = create_params(settings, request_id, logout_message, params)
-        params_prefix = (settings.idp_slo_target_url =~ /\?/) ? '&' : '?'
+        params_prefix = (settings.idp_sloresp_target_url =~ /\?/) ? '&' : '?' #MC
         saml_response = CGI.escape(params.delete("SAMLResponse"))
         response_params = "#{params_prefix}SAMLResponse=#{saml_response}"
         params.each_pair do |key, value|
           response_params << "&#{key.to_s}=#{CGI.escape(value.to_s)}"
         end
 
-        @logout_url = settings.idp_slo_target_url + response_params
+        @logout_url = settings.idp_sloresp_target_url + response_params #MC
       end
 
       # Creates the Get parameters for the logout response.
@@ -119,7 +119,7 @@ module OneLogin
         root.attributes['IssueInstant'] = time
         root.attributes['Version'] = '2.0'
         root.attributes['InResponseTo'] = request_id unless request_id.nil?
-        root.attributes['Destination'] = settings.idp_slo_target_url unless settings.idp_slo_target_url.nil?
+        root.attributes['Destination'] = settings.idp_sloresp_target_url unless settings.idp_sloresp_target_url.nil?
 
         if settings.issuer != nil
           issuer = root.add_element "saml:Issuer"
