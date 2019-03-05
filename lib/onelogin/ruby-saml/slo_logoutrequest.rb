@@ -55,11 +55,26 @@ module OneLogin
         validate(collect_errors)
       end
 
+      # from response.rb
+      def name_id_node #MC
+        @name_id_node ||=
+          begin
+            encrypted_node = xpath_first_from_signed_assertion('/p:LogoutRequest/a:EncryptedID')
+            if encrypted_node
+              node = decrypt_nameid(encrypted_node)
+              STDERR.puts "\n\n\n\n#{node}\n\n\n\n" unless Rails.env.production?
+            else
+              node = xpath_first_from_signed_assertion('/a:LogoutRequest/a:NameID')
+            end
+          end
+      end
+
       # @return [String] Gets the NameID of the Logout Request.
       #
       def name_id
         @name_id ||= begin
-          node = REXML::XPath.first(document, "/p:LogoutRequest/a:NameID", { "p" => PROTOCOL, "a" => ASSERTION })
+          node = name_id_node
+          #node = REXML::XPath.first(document, "/p:LogoutRequest/a:NameID", { "p" => PROTOCOL, "a" => ASSERTION })
           Utils.element_text(node)
         end
       end
@@ -69,7 +84,8 @@ module OneLogin
       # @return [String] Gets the NameID Format of the Logout Request.
       #
       def name_id_format
-        @name_id_node ||= REXML::XPath.first(document, "/p:LogoutRequest/a:NameID", { "p" => PROTOCOL, "a" => ASSERTION })
+        @name_id_node = name_id_node
+        #@name_id_node ||= REXML::XPath.first(document, "/p:LogoutRequest/a:NameID", { "p" => PROTOCOL, "a" => ASSERTION })
         @name_id_format ||=
           if @name_id_node && @name_id_node.attribute("Format")
             @name_id_node.attribute("Format").value
