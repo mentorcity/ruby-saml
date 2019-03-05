@@ -108,7 +108,7 @@ module OneLogin
         response_doc.uuid = uuid
 
         if add_soap_wrapper
-          response_doc << REXML::XMLDecl.new(nil, "UTF-8") #MC
+          #response_doc << REXML::XMLDecl.new(nil, "UTF-8") #MC
           rootroot = response_doc.add_element 'soap:Envelope', { 'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance', 'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema', 'xmlns:soap' => 'http://schemas.xmlsoap.org/soap/envelope/' } #MC
           body = rootroot.add_element 'soap:Body' #MC
         else
