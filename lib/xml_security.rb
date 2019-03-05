@@ -89,7 +89,7 @@ module XMLSecurity
     SHA384          = "http://www.w3.org/2001/04/xmldsig-more#sha384"
     SHA512          = 'http://www.w3.org/2001/04/xmlenc#sha512'
     ENVELOPED_SIG   = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
-    INC_PREFIX_LIST = "#default soap samlp saml ds xs xsi md" #MC
+    INC_PREFIX_LIST = "#default soap samlp saml ds xs xsi md xsd" #MC
 
     attr_writer :uuid
 
