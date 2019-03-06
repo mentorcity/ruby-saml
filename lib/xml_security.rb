@@ -200,7 +200,8 @@ module XMLSecurity
       # call out to xmlsec1 here
       f = Tempfile.new('saml')
       begin
-        document.write(f)
+        f.write(document.to_s)
+        f.flush
         encrypted = %x[xmlsec1 encrypt --pubkey-cert-pem #{certfile} --session-key des-192 --xml-data #{f.path} --node-xpath /samlp:LogoutRequest/saml:NameID lib/enc_data_template.xml].gsub(/\n/,'')
       ensure
         f.close
