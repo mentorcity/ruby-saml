@@ -118,7 +118,7 @@ module OneLogin
           issuer.text = settings.issuer
         end
 
-        nameid = root.add_element "saml:NameID"
+        nameid = root.add_element "saml:NameID", { "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion" } #MC
         if settings.name_identifier_value
           nameid.attributes['NameQualifier'] = settings.idp_name_qualifier if settings.idp_name_qualifier
           nameid.attributes['SPNameQualifier'] = settings.sp_name_qualifier if settings.sp_name_qualifier
