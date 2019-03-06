@@ -209,7 +209,7 @@ module XMLSecurity
       end
       doc = Nokogiri::XML(encrypted)
       doc.remove_namespaces!
-      ciphervalue.text, kiphervalue.text = doc.xpath('//CipherValue').map(&:text)
+      kiphervalue.text, ciphervalue.text = doc.xpath('//CipherValue').map(&:text)
 
       elements = document.elements[selector]
       elements.replace_with(enc_wrapper)
