@@ -201,12 +201,12 @@ module XMLSecurity
       f = Tempfile.new('saml')
       begin
         document.write(f)
-        stuff = %x[xmlsec1 encrypt --pubkey-pem #{certfile} --session-key des-192 --xml-data #{f.path} --node-xpath /samlp:LogoutRequest/saml:NameID template.xml].gsub(/\n/,'')
+        encrypted = %x[xmlsec1 encrypt --pubkey-cert-pem #{certfile} --session-key des-192 --xml-data #{f.path} --node-xpath /samlp:LogoutRequest/saml:NameID template.xml].gsub(/\n/,'')
       ensure
         f.close
         f.unlink
       end
-      doc = Nokogiri::XML(stuff)
+      doc = Nokogiri::XML(encrypted)
       doc.remove_namespaces!
       ciphervalue.text, kiphervalue.text = doc.xpath('//CipherValue').map(&:text)
 
