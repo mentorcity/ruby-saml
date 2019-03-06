@@ -177,7 +177,7 @@ module XMLSecurity
       end
     end
 
-    def encrypt_elements(document, selector, cert)
+    def encrypt_elements(document, selector, certfile)
       #ek = "fe282000712f4dbe85791fd1c988061c"
       #ed = "ee2eaf68162b49bdbf16c851c1099cb0"
       enc_wrapper = REXML::Element.new('saml:EncryptedID').add_namespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion')
@@ -201,7 +201,7 @@ module XMLSecurity
       f = Tempfile.new('saml')
       begin
         document.write(f)
-        stuff = %x[xmlsec1 encrypt --pubkey-pem saml.pem --session-key des-192 --xml-data #{f.path} --node-xpath /samlp:LogoutRequest/saml:NameID template.xml].gsub(/\n/,'')
+        stuff = %x[xmlsec1 encrypt --pubkey-pem #{certfile} --session-key des-192 --xml-data #{f.path} --node-xpath /samlp:LogoutRequest/saml:NameID template.xml].gsub(/\n/,'')
       ensure
         f.close
         f.unlink
