@@ -178,6 +178,8 @@ module XMLSecurity
     end
 
     def encrypt_elements(document, selector, cert)
+      #ek = "fe282000712f4dbe85791fd1c988061c"
+      #ed = "ee2eaf68162b49bdbf16c851c1099cb0"
       enc_wrapper = REXML::Element.new('saml:EncryptedID').add_namespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion')
       data = enc_wrapper.add_element('xenc:EncryptedData', { 'Type' => 'http://www.w3.org/2001/04/xmlenc#Element', 'ID' => 'ee2eaf68162b49bdbf16c851c1099cb0' }).add_namespace('xenc', 'http://www.w3.org/2001/04/xmlenc#')
       data.add_element('xenc:EncryptionMethod', { 'Algorithm' => 'http://www.w3.org/2001/04/xmlenc#aes128-cbc' })
@@ -195,16 +197,18 @@ module XMLSecurity
       ref = key.add_element('xenc:ReferenceList')
       ref.add_element('xenc:DataReference', { 'URI' => '#ee2eaf68162b49bdbf16c851c1099cb0' })
 
-      cipher = OpenSSL::Cipher.new('AES-128-CBC')
-      cipher.encrypt
-      key = cipher.random_key
-      iv = cipher.random_iv # also sets the generated IV on the Cipher
-      encrypted = cipher.update(elements.to_s) + cipher.final
-      ciphervalue.text = Base64.encode64(encrypted)
-
-      kelement = key + iv
-      kencrypted = cert.public_encrypt(kelement.to_s, OpenSSL::PKey::RSA::PKCS1_OAEP_PADDING)
-      kiphervalue.text = Base64.encode64(kencrypted)
+      # call out to xmlsec1 here
+      f = Tempfile.new('saml')
+      begin
+        document.write(f)
+        stuff = %x[xmlsec1 encrypt --pubkey-pem saml.pem --session-key des-192 --xml-data #{f.path} --node-xpath /samlp:LogoutRequest/saml:NameID template.xml].gsub(/\n/,'')
+      ensure
+        f.close
+        f.unlink
+      end
+      doc = Nokogiri::XML(stuff)
+      doc.remove_namespaces!
+      ciphervalue.text, kiphervalue.text = doc.xpath('//CipherValue').map(&:text)
 
       elements = document.elements[selector]
       elements.replace_with(enc_wrapper)
