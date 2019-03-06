@@ -182,14 +182,14 @@ module XMLSecurity
       #ed = "ee2eaf68162b49bdbf16c851c1099cb0"
       enc_wrapper = REXML::Element.new('saml:EncryptedID').add_namespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion')
       data = enc_wrapper.add_element('xenc:EncryptedData', { 'Type' => 'http://www.w3.org/2001/04/xmlenc#Element', 'ID' => 'ee2eaf68162b49bdbf16c851c1099cb0' }).add_namespace('xenc', 'http://www.w3.org/2001/04/xmlenc#')
-      data.add_element('xenc:EncryptionMethod', { 'Algorithm' => 'http://www.w3.org/2001/04/xmlenc#aes128-cbc' })
+      data.add_element('xenc:EncryptionMethod', { 'Algorithm' => 'http://www.w3.org/2001/04/xmlenc#tripledes-cbc' })
       cipherdata = data.add_element('xenc:CipherData')
       ciphervalue = cipherdata.add_element('xenc:CipherValue')
 
       keyinfo = data.add_element('ds:KeyInfo').add_namespace('ds', 'http://www.w3.org/2000/09/xmldsig#')
       keyinfo.add_element('ds:RetrievalMethod', { 'Type' => 'http://www.w3/org/2001/04/xmlenc#EncryptedKey', 'URI' => 'fe282000712f4dbe85791fd1c988061c' })
       key = enc_wrapper.add_element('xenc:EncryptedKey', { 'ID' => 'fe282000712f4dbe85791fd1c988061c' }).add_namespace('xenc', 'http://www.w3.org/2001/04/xmlenc#')
-      encm = key.add_element('xenc:EncryptionMethod', { 'Algorithm' => 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p' })
+      encm = key.add_element('xenc:EncryptionMethod', { 'Algorithm' => 'http://www.w3.org/2001/04/xmlenc#rsa-1_5' })
       encm.add_element('ds:DigestMethod', { 'Algorithm' => 'http://www.w3.org/2000/09/xmldsig#sha1' }).add_namespace('ds', 'http://www.w3/org/2000/09/xmldsig#')
       kipherdata = key.add_element('xenc:CipherData')
       kiphervalue = kipherdata.add_element('xenc:CipherValue')
