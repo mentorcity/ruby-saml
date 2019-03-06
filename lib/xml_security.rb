@@ -190,7 +190,7 @@ module XMLSecurity
       keyinfo.add_element('ds:RetrievalMethod', { 'Type' => 'http://www.w3/org/2001/04/xmlenc#EncryptedKey', 'URI' => 'fe282000712f4dbe85791fd1c988061c' })
       key = enc_wrapper.add_element('xenc:EncryptedKey', { 'ID' => 'fe282000712f4dbe85791fd1c988061c' }).add_namespace('xenc', 'http://www.w3.org/2001/04/xmlenc#')
       encm = key.add_element('xenc:EncryptionMethod', { 'Algorithm' => 'http://www.w3.org/2001/04/xmlenc#rsa-1_5' })
-      encm.add_element('ds:DigestMethod', { 'Algorithm' => 'http://www.w3.org/2000/09/xmldsig#sha1' }).add_namespace('ds', 'http://www.w3/org/2000/09/xmldsig#')
+      encm.add_element('ds:DigestMethod', { 'Algorithm' => 'http://www.w3.org/2000/09/xmldsig#sha256' }).add_namespace('ds', 'http://www.w3/org/2000/09/xmldsig#')
       kipherdata = key.add_element('xenc:CipherData')
       kiphervalue = kipherdata.add_element('xenc:CipherValue')
 
